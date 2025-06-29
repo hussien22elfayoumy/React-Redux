@@ -1,12 +1,11 @@
-import { Fragment } from 'react';
 import MainHeader from './main-header';
 
-const Layout = (props) => {
+const Layout = ({ children }) => {
   return (
-    <Fragment>
+    <>
       <MainHeader />
-      <main>{props.children}</main>
-    </Fragment>
+      <main>{children}</main>
+    </>
   );
 };
 
