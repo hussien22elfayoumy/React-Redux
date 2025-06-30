@@ -9,10 +9,15 @@ const cartSlice = createSlice({
   },
 
   reducers: {
+    replaceCart(state, action) {
+      state.items = action.payload.items;
+      state.totalQuantity = action.payload.totalQuantity;
+    },
     addItemToCart(state, actions) {
       const newItem = actions.payload;
       const existingItem = state.items.find((item) => item.id === newItem.id);
       state.totalQuantity++;
+      state.changed = true;
 
       if (!existingItem) {
         state.items.push({
@@ -42,6 +47,41 @@ const cartSlice = createSlice({
     },
   },
 });
+
+export const fetchCartData = () => async (dispatch) => {
+  const fetchData = async () => {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/cart.json`);
+
+    if (!res.ok) {
+      throw new Error('There was an error sending cart data');
+    }
+
+    const data = await res.json();
+
+    return data;
+  };
+
+  try {
+    const cartData = await fetchData();
+    console.log(cartData);
+
+    dispatch(
+      cartActions.replaceCart({
+        items: cartData.items || [],
+        totalQuantity: cartData.totalQuantity,
+      })
+    );
+  } catch (error) {
+    console.log(error);
+    dispatch(
+      uiActions.showNotifications({
+        status: 'error',
+        title: 'Error!',
+        message: 'Fetching cart data failed!',
+      })
+    );
+  }
+};
 
 // Actions creator thunk
 export const sendCartData = (cart) => async (dispatch) => {

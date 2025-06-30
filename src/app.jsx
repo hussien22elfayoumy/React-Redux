@@ -4,7 +4,7 @@ import Layout from './components/layout/layout';
 import Products from './components/shop/products';
 import { useEffect } from 'react';
 import Notification from './components/ui/notification';
-import { sendCartData } from './store/cart-slice';
+import { fetchCartData, sendCartData } from './store/cart-slice';
 
 let initialRenderNumber = 1;
 
@@ -12,6 +12,10 @@ function App() {
   const { cartIsVisible, notification } = useSelector((state) => state.ui);
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchCartData());
+  }, [dispatch]);
 
   useEffect(() => {
     if (initialRenderNumber <= 2) {
