@@ -6,6 +6,7 @@ const cartSlice = createSlice({
   initialState: {
     items: [],
     totalQuantity: 0,
+    changed: false,
   },
 
   reducers: {
@@ -37,6 +38,7 @@ const cartSlice = createSlice({
       const id = actions.payload;
       const existingItem = state.items.find((item) => item.id === id);
       state.totalQuantity--;
+      state.changed = true;
 
       if (existingItem.quantity === 1) {
         state.items = state.items.filter((item) => item.id !== id);
@@ -63,7 +65,6 @@ export const fetchCartData = () => async (dispatch) => {
 
   try {
     const cartData = await fetchData();
-    console.log(cartData);
 
     dispatch(
       cartActions.replaceCart({
@@ -72,7 +73,7 @@ export const fetchCartData = () => async (dispatch) => {
       })
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
     dispatch(
       uiActions.showNotifications({
         status: 'error',
@@ -118,7 +119,7 @@ export const sendCartData = (cart) => async (dispatch) => {
       })
     );
   } catch (error) {
-    console.log(error);
+    console.error(error);
     dispatch(
       uiActions.showNotifications({
         status: 'error',
