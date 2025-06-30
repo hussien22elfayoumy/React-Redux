@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { uiActions } from './ui-slice';
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -41,6 +42,52 @@ const cartSlice = createSlice({
     },
   },
 });
+
+// Actions creator thunk
+export const sendCartData = (cart) => async (dispatch) => {
+  dispatch(
+    uiActions.showNotifications({
+      status: 'pending',
+      title: 'Sending...',
+      message: 'Sending cart data',
+    })
+  );
+
+  const sendRequest = async () => {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/cart.json`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/jsonm',
+      },
+      body: JSON.stringify(cart),
+    });
+
+    if (!res.ok) {
+      throw new Error('There was an error sending cart data');
+    }
+  };
+
+  try {
+    await sendRequest();
+
+    dispatch(
+      uiActions.showNotifications({
+        status: 'success',
+        title: 'Success!',
+        message: 'Sent cart data successfully',
+      })
+    );
+  } catch (error) {
+    console.log(error);
+    dispatch(
+      uiActions.showNotifications({
+        status: 'error',
+        title: 'Error!',
+        message: 'Sending cart data failed!',
+      })
+    );
+  }
+};
 
 export const cartActions = cartSlice.actions;
 export default cartSlice.reducer;

@@ -3,8 +3,8 @@ import Cart from './components/cart/cart';
 import Layout from './components/layout/layout';
 import Products from './components/shop/products';
 import { useEffect } from 'react';
-import { uiActions } from './store/ui-slice';
 import Notification from './components/ui/notification';
+import { sendCartData } from './store/cart-slice';
 
 let initialRenderNumber = 1;
 
@@ -14,50 +14,12 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const sendCartData = async () => {
-      dispatch(
-        uiActions.showNotifications({
-          status: 'pending',
-          title: 'Sending...',
-          message: 'Sending cart data',
-        })
-      );
-
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/cart.json`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/jsonm',
-        },
-        body: JSON.stringify(cart),
-      });
-      if (!res.ok) {
-        throw new Error('There was an error sending cart data');
-      }
-
-      dispatch(
-        uiActions.showNotifications({
-          status: 'success',
-          title: 'Success!',
-          message: 'Sent cart data successfully',
-        })
-      );
-    };
-
     if (initialRenderNumber <= 2) {
       initialRenderNumber++;
       return;
     }
 
-    sendCartData().catch((err) => {
-      console.log(err);
-      dispatch(
-        uiActions.showNotifications({
-          status: 'error',
-          title: 'Error!',
-          message: 'Sending cart data failed!',
-        })
-      );
-    });
+    dispatch(sendCartData(cart));
   }, [cart, dispatch]);
 
   return (
